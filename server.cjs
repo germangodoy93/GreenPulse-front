@@ -6,19 +6,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const API_TARGET = 'https://greenpulse-back-production.up.railway.app';
 
-// Proxy /api → backend (server-to-server, no CORS)
+// Proxy /api/** preserving the full path (no prefix stripping)
 app.use(
-  '/api',
   createProxyMiddleware({
     target: API_TARGET,
     changeOrigin: true,
+    pathFilter: ['/api/**'],
   })
 );
 
 // Serve built React app
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// SPA fallback — all routes return index.html
+// SPA fallback — React Router handles client-side routing
 app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
